@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F009A8115B5B713004FF7B3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F009A8015B5B713004FF7B3 /* Foundation.framework */; };
+		1F009AA715B5B791004FF7B3 /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9B15B4F64900AD8791 /* callbacks.c */; };
+		1F009AA815B5B791004FF7B3 /* compress.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9C15B4F64900AD8791 /* compress.c */; };
+		1F009AA915B5B791004FF7B3 /* host.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9D15B4F64900AD8791 /* host.c */; };
+		1F009AAA15B5B791004FF7B3 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9E15B4F64900AD8791 /* list.c */; };
+		1F009AAB15B5B791004FF7B3 /* packet.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9F15B4F64900AD8791 /* packet.c */; };
+		1F009AAC15B5B791004FF7B3 /* peer.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA015B4F64900AD8791 /* peer.c */; };
+		1F009AAD15B5B791004FF7B3 /* protocol.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA115B4F64900AD8791 /* protocol.c */; };
+		1F009AAE15B5B791004FF7B3 /* unix.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA215B4F64900AD8791 /* unix.c */; };
+		1F009AAF15B5B791004FF7B3 /* win32.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA315B4F64900AD8791 /* win32.c */; };
 		F4F52F8D15B4F60C00AD8791 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F52F8C15B4F60C00AD8791 /* CoreFoundation.framework */; };
 		F4F52F9315B4F60C00AD8791 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F4F52F9115B4F60C00AD8791 /* InfoPlist.strings */; };
 		F4F52FA415B4F64900AD8791 /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9B15B4F64900AD8791 /* callbacks.c */; };
@@ -21,6 +31,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1F009A7F15B5B713004FF7B3 /* libenetlibios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libenetlibios.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F009A8015B5B713004FF7B3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1F009A8415B5B713004FF7B3 /* enetlibios-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "enetlibios-Prefix.pch"; sourceTree = "<group>"; };
+		1F009A8E15B5B713004FF7B3 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		1F009A9015B5B713004FF7B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		F4F52F8915B4F60C00AD8791 /* enetlib.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = enetlib.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4F52F8C15B4F60C00AD8791 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		F4F52F9015B4F60C00AD8791 /* enetlib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "enetlib-Info.plist"; sourceTree = "<group>"; };
@@ -47,6 +62,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1F009A7C15B5B713004FF7B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F009A8115B5B713004FF7B3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4F52F8615B4F60C00AD8791 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -58,10 +81,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1F009A8215B5B713004FF7B3 /* enetlibios */ = {
+			isa = PBXGroup;
+			children = (
+				1F009A8315B5B713004FF7B3 /* Supporting Files */,
+			);
+			path = enetlibios;
+			sourceTree = "<group>";
+		};
+		1F009A8315B5B713004FF7B3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1F009A8415B5B713004FF7B3 /* enetlibios-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		F4F52F7E15B4F60C00AD8791 = {
 			isa = PBXGroup;
 			children = (
 				F4F52F8E15B4F60C00AD8791 /* enetlib */,
+				1F009A8215B5B713004FF7B3 /* enetlibios */,
 				F4F52F8B15B4F60C00AD8791 /* Frameworks */,
 				F4F52F8A15B4F60C00AD8791 /* Products */,
 			);
@@ -71,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				F4F52F8915B4F60C00AD8791 /* enetlib.bundle */,
+				1F009A7F15B5B713004FF7B3 /* libenetlibios.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -79,6 +120,9 @@
 			isa = PBXGroup;
 			children = (
 				F4F52F8C15B4F60C00AD8791 /* CoreFoundation.framework */,
+				1F009A8015B5B713004FF7B3 /* Foundation.framework */,
+				1F009A8E15B5B713004FF7B3 /* SenTestingKit.framework */,
+				1F009A9015B5B713004FF7B3 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -138,7 +182,34 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		1F009A7D15B5B713004FF7B3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		1F009A7E15B5B713004FF7B3 /* enetlibios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F009AA315B5B713004FF7B3 /* Build configuration list for PBXNativeTarget "enetlibios" */;
+			buildPhases = (
+				1F009A7B15B5B713004FF7B3 /* Sources */,
+				1F009A7C15B5B713004FF7B3 /* Frameworks */,
+				1F009A7D15B5B713004FF7B3 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = enetlibios;
+			productName = enetlibios;
+			productReference = 1F009A7F15B5B713004FF7B3 /* libenetlibios.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		F4F52F8815B4F60C00AD8791 /* enetlib */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F4F52F9715B4F60C00AD8791 /* Build configuration list for PBXNativeTarget "enetlib" */;
@@ -177,6 +248,7 @@
 			projectRoot = "";
 			targets = (
 				F4F52F8815B4F60C00AD8791 /* enetlib */,
+				1F009A7E15B5B713004FF7B3 /* enetlibios */,
 			);
 		};
 /* End PBXProject section */
@@ -193,6 +265,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1F009A7B15B5B713004FF7B3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F009AA715B5B791004FF7B3 /* callbacks.c in Sources */,
+				1F009AA815B5B791004FF7B3 /* compress.c in Sources */,
+				1F009AA915B5B791004FF7B3 /* host.c in Sources */,
+				1F009AAA15B5B791004FF7B3 /* list.c in Sources */,
+				1F009AAB15B5B791004FF7B3 /* packet.c in Sources */,
+				1F009AAC15B5B791004FF7B3 /* peer.c in Sources */,
+				1F009AAD15B5B791004FF7B3 /* protocol.c in Sources */,
+				1F009AAE15B5B791004FF7B3 /* unix.c in Sources */,
+				1F009AAF15B5B791004FF7B3 /* win32.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4F52F8515B4F60C00AD8791 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -223,6 +311,37 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		1F009A9F15B5B713004FF7B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/enetlibios.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "enetlibios/enetlibios-Prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		1F009AA015B5B713004FF7B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/enetlibios.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "enetlibios/enetlibios-Prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		F4F52F9515B4F60C00AD8791 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -230,6 +349,7 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = ../include;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -244,6 +364,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -258,6 +379,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = ../include;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -265,6 +387,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
@@ -301,6 +424,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1F009AA315B5B713004FF7B3 /* Build configuration list for PBXNativeTarget "enetlibios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F009A9F15B5B713004FF7B3 /* Debug */,
+				1F009AA015B5B713004FF7B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		F4F52F8315B4F60C00AD8791 /* Build configuration list for PBXProject "enetlib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -317,6 +448,7 @@
 				F4F52F9915B4F60C00AD8791 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
