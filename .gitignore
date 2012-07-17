@@ -26,3 +26,5 @@ config.status
 config.sub
 configure
 depcomp
+xcode/enetlib.xcodeproj/xcuserdata/
+xcode/enetlib.xcodeproj/project.xcworkspace/xcuserdata/
