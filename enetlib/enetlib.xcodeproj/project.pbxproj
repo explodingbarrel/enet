@@ -1,0 +1,324 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F4F52F8D15B4F60C00AD8791 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F52F8C15B4F60C00AD8791 /* CoreFoundation.framework */; };
+		F4F52F9315B4F60C00AD8791 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F4F52F9115B4F60C00AD8791 /* InfoPlist.strings */; };
+		F4F52FA415B4F64900AD8791 /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9B15B4F64900AD8791 /* callbacks.c */; };
+		F4F52FA515B4F64900AD8791 /* compress.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9C15B4F64900AD8791 /* compress.c */; };
+		F4F52FA615B4F64900AD8791 /* host.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9D15B4F64900AD8791 /* host.c */; };
+		F4F52FA715B4F64900AD8791 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9E15B4F64900AD8791 /* list.c */; };
+		F4F52FA815B4F64900AD8791 /* packet.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52F9F15B4F64900AD8791 /* packet.c */; };
+		F4F52FA915B4F64900AD8791 /* peer.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA015B4F64900AD8791 /* peer.c */; };
+		F4F52FAA15B4F64900AD8791 /* protocol.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA115B4F64900AD8791 /* protocol.c */; };
+		F4F52FAB15B4F64900AD8791 /* unix.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA215B4F64900AD8791 /* unix.c */; };
+		F4F52FAC15B4F64900AD8791 /* win32.c in Sources */ = {isa = PBXBuildFile; fileRef = F4F52FA315B4F64900AD8791 /* win32.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F4F52F8915B4F60C00AD8791 /* enetlib.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = enetlib.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4F52F8C15B4F60C00AD8791 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		F4F52F9015B4F60C00AD8791 /* enetlib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "enetlib-Info.plist"; sourceTree = "<group>"; };
+		F4F52F9215B4F60C00AD8791 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F4F52F9415B4F60C00AD8791 /* enetlib-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "enetlib-Prefix.pch"; sourceTree = "<group>"; };
+		F4F52F9B15B4F64900AD8791 /* callbacks.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = callbacks.c; path = ../../callbacks.c; sourceTree = "<group>"; };
+		F4F52F9C15B4F64900AD8791 /* compress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = compress.c; path = ../../compress.c; sourceTree = "<group>"; };
+		F4F52F9D15B4F64900AD8791 /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = host.c; path = ../../host.c; sourceTree = "<group>"; };
+		F4F52F9E15B4F64900AD8791 /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = ../../list.c; sourceTree = "<group>"; };
+		F4F52F9F15B4F64900AD8791 /* packet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = packet.c; path = ../../packet.c; sourceTree = "<group>"; };
+		F4F52FA015B4F64900AD8791 /* peer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = peer.c; path = ../../peer.c; sourceTree = "<group>"; };
+		F4F52FA115B4F64900AD8791 /* protocol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = protocol.c; path = ../../protocol.c; sourceTree = "<group>"; };
+		F4F52FA215B4F64900AD8791 /* unix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unix.c; path = ../../unix.c; sourceTree = "<group>"; };
+		F4F52FA315B4F64900AD8791 /* win32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = win32.c; path = ../../win32.c; sourceTree = "<group>"; };
+		F4F52FAF15B4F66D00AD8791 /* callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = callbacks.h; sourceTree = "<group>"; };
+		F4F52FB015B4F66D00AD8791 /* enet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = enet.h; sourceTree = "<group>"; };
+		F4F52FB115B4F66D00AD8791 /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		F4F52FB215B4F66D00AD8791 /* protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = protocol.h; sourceTree = "<group>"; };
+		F4F52FB315B4F66D00AD8791 /* time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = time.h; sourceTree = "<group>"; };
+		F4F52FB415B4F66D00AD8791 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		F4F52FB515B4F66D00AD8791 /* unix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unix.h; sourceTree = "<group>"; };
+		F4F52FB615B4F66D00AD8791 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
+		F4F52FB715B4F66D00AD8791 /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F4F52F8615B4F60C00AD8791 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4F52F8D15B4F60C00AD8791 /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F4F52F7E15B4F60C00AD8791 = {
+			isa = PBXGroup;
+			children = (
+				F4F52F8E15B4F60C00AD8791 /* enetlib */,
+				F4F52F8B15B4F60C00AD8791 /* Frameworks */,
+				F4F52F8A15B4F60C00AD8791 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F4F52F8A15B4F60C00AD8791 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F4F52F8915B4F60C00AD8791 /* enetlib.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F4F52F8B15B4F60C00AD8791 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F4F52F8C15B4F60C00AD8791 /* CoreFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F4F52F8E15B4F60C00AD8791 /* enetlib */ = {
+			isa = PBXGroup;
+			children = (
+				F4F52FAE15B4F66D00AD8791 /* enet */,
+				F4F52F9A15B4F61F00AD8791 /* Source */,
+				F4F52F8F15B4F60C00AD8791 /* Supporting Files */,
+			);
+			path = enetlib;
+			sourceTree = "<group>";
+		};
+		F4F52F8F15B4F60C00AD8791 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F4F52F9015B4F60C00AD8791 /* enetlib-Info.plist */,
+				F4F52F9115B4F60C00AD8791 /* InfoPlist.strings */,
+				F4F52F9415B4F60C00AD8791 /* enetlib-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F4F52F9A15B4F61F00AD8791 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				F4F52F9B15B4F64900AD8791 /* callbacks.c */,
+				F4F52F9C15B4F64900AD8791 /* compress.c */,
+				F4F52F9D15B4F64900AD8791 /* host.c */,
+				F4F52F9E15B4F64900AD8791 /* list.c */,
+				F4F52F9F15B4F64900AD8791 /* packet.c */,
+				F4F52FA015B4F64900AD8791 /* peer.c */,
+				F4F52FA115B4F64900AD8791 /* protocol.c */,
+				F4F52FA215B4F64900AD8791 /* unix.c */,
+				F4F52FA315B4F64900AD8791 /* win32.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		F4F52FAE15B4F66D00AD8791 /* enet */ = {
+			isa = PBXGroup;
+			children = (
+				F4F52FAF15B4F66D00AD8791 /* callbacks.h */,
+				F4F52FB015B4F66D00AD8791 /* enet.h */,
+				F4F52FB115B4F66D00AD8791 /* list.h */,
+				F4F52FB215B4F66D00AD8791 /* protocol.h */,
+				F4F52FB315B4F66D00AD8791 /* time.h */,
+				F4F52FB415B4F66D00AD8791 /* types.h */,
+				F4F52FB515B4F66D00AD8791 /* unix.h */,
+				F4F52FB615B4F66D00AD8791 /* utility.h */,
+				F4F52FB715B4F66D00AD8791 /* win32.h */,
+			);
+			name = enet;
+			path = ../../include/enet;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F4F52F8815B4F60C00AD8791 /* enetlib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4F52F9715B4F60C00AD8791 /* Build configuration list for PBXNativeTarget "enetlib" */;
+			buildPhases = (
+				F4F52F8515B4F60C00AD8791 /* Sources */,
+				F4F52F8615B4F60C00AD8791 /* Frameworks */,
+				F4F52F8715B4F60C00AD8791 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = enetlib;
+			productName = enetlib;
+			productReference = F4F52F8915B4F60C00AD8791 /* enetlib.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F4F52F8015B4F60C00AD8791 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = F4F52F8315B4F60C00AD8791 /* Build configuration list for PBXProject "enetlib" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F4F52F7E15B4F60C00AD8791;
+			productRefGroup = F4F52F8A15B4F60C00AD8791 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F4F52F8815B4F60C00AD8791 /* enetlib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F4F52F8715B4F60C00AD8791 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4F52F9315B4F60C00AD8791 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F4F52F8515B4F60C00AD8791 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4F52FA415B4F64900AD8791 /* callbacks.c in Sources */,
+				F4F52FA515B4F64900AD8791 /* compress.c in Sources */,
+				F4F52FA615B4F64900AD8791 /* host.c in Sources */,
+				F4F52FA715B4F64900AD8791 /* list.c in Sources */,
+				F4F52FA815B4F64900AD8791 /* packet.c in Sources */,
+				F4F52FA915B4F64900AD8791 /* peer.c in Sources */,
+				F4F52FAA15B4F64900AD8791 /* protocol.c in Sources */,
+				F4F52FAB15B4F64900AD8791 /* unix.c in Sources */,
+				F4F52FAC15B4F64900AD8791 /* win32.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F4F52F9115B4F60C00AD8791 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F4F52F9215B4F60C00AD8791 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F4F52F9515B4F60C00AD8791 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F4F52F9615B4F60C00AD8791 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F4F52F9815B4F60C00AD8791 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "enetlib/enetlib-Prefix.pch";
+				HEADER_SEARCH_PATHS = ../include;
+				INFOPLIST_FILE = "enetlib/enetlib-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		F4F52F9915B4F60C00AD8791 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "enetlib/enetlib-Prefix.pch";
+				HEADER_SEARCH_PATHS = ../include;
+				INFOPLIST_FILE = "enetlib/enetlib-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F4F52F8315B4F60C00AD8791 /* Build configuration list for PBXProject "enetlib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4F52F9515B4F60C00AD8791 /* Debug */,
+				F4F52F9615B4F60C00AD8791 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F4F52F9715B4F60C00AD8791 /* Build configuration list for PBXNativeTarget "enetlib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4F52F9815B4F60C00AD8791 /* Debug */,
+				F4F52F9915B4F60C00AD8791 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F4F52F8015B4F60C00AD8791 /* Project object */;
+}
