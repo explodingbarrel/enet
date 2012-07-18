@@ -235,7 +235,6 @@ typedef struct _ENetChannel
  */
 typedef struct _ENetPeer
 { 
-   ENetAddress   address;            /**< Internet address of the peer */ 
    ENetListNode  dispatchList;
    struct _ENetHost * host;
    enet_uint16   outgoingPeerID;
@@ -243,6 +242,7 @@ typedef struct _ENetPeer
    enet_uint32   connectID;
    enet_uint8    outgoingSessionID;
    enet_uint8    incomingSessionID;
+   ENetAddress   address;            /**< Internet address of the peer */
    void *        data;               /**< Application private data, may be freely modified */
    ENetPeerState state;
    ENetChannel * channels;
