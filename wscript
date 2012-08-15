@@ -26,7 +26,7 @@ def configure(conf):
 def build(bld):
   obj = bld.new_task_gen("cxx", "shlib", "node_addon")
   obj.target = "enet"
-  obj.source = ["node/enet.cc","callbacks.c","compress.c","host.c","list.c","packet.c","peer.c","protocol.c","unix.c"]
+  obj.source = ["node/enet.cc","callbacks.cc","compress.cc","host.cc","list.cc","packet.cc","peer.cc","protocol.cc","unix.cc"]
   # obj.uselib = "NODE"
 
 def shutdown():
