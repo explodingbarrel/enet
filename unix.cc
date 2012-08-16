@@ -24,11 +24,14 @@
 
 #ifdef __APPLE__
 #undef HAS_POLL
-#define HAS_SOCKLEN_T
 #endif
 
 #ifdef HAS_POLL
 #include <sys/poll.h>
+#endif
+
+#ifdef __socklen_t_defined
+#define HAS_SOCKLEN_T
 #endif
 
 #ifndef HAS_SOCKLEN_T
