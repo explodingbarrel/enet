@@ -30,3 +30,5 @@ xcode/enetlib.xcodeproj/xcuserdata/
 xcode/enetlib.xcodeproj/project.xcworkspace/xcuserdata/
 enet.node
 build/
+android/obj/
+android/libs/
