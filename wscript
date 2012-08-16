@@ -19,6 +19,9 @@ def configure(conf):
   conf.check_tool("compiler_cxx")
   conf.check_tool("node_addon")
   conf.env.append_value('CXXFLAGS', ['-O3', '-funroll-loops'])
+  conf.define('HAS_SOCKLEN_T', 1)
+  conf.define('HAS_POLL', 1)
+  conf.define('HAS_FCNTL', 1)
 
   # conf.env.append_value('CXXFLAGS', ['-DDEBUG', '-g', '-O0', '-Wall', '-Wextra'])
   # conf.check(lib='node', libpath=['/usr/lib', '/usr/local/lib'], uselib_store='NODE')
@@ -31,10 +34,8 @@ def build(bld):
   # obj.uselib = "NODE"
 
 def shutdown():
-  # HACK to get compress.node out of build directory.
-  # better way to do this?
   try:
-  	unlink('bson.node')
+  	unlink('enet.node')
   except:
   	print('')
   	
