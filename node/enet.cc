@@ -136,14 +136,8 @@ public:
         {
             return v8::ThrowException(v8::Exception::Error(v8::String::New("packet has been sent and is now invalid")));
         }
-        node::Buffer *slowBuf = node::Buffer::New(packet->packet->dataLength);
-        ::memcpy((void *) node::Buffer::Data(slowBuf), packet->packet->data,
-            packet->packet->dataLength);
-        v8::Local<v8::Object> globalObj = v8::Context::GetCurrent()->Global();
-        v8::Local<v8::Function> bufferConstructor = v8::Local<v8::Function>::Cast(globalObj->Get(v8::String::New("Buffer")));
-        v8::Handle<v8::Value> constructorArgs[3] = { slowBuf->handle_, v8::Integer::New(packet->packet->dataLength), v8::Integer::New(0) };
-        v8::Local<v8::Object> actualBuffer = bufferConstructor->NewInstance(3, constructorArgs);
-        return scope.Close(actualBuffer);
+        node::Buffer* buffer = node::Buffer::New( (char*)packet->packet->data, packet->packet->dataLength);
+        return scope.Close(buffer->handle_);
     }
     
     static v8::Handle<v8::Value> Flags(const v8::Arguments& args)
