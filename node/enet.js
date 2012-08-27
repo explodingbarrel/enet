@@ -61,7 +61,9 @@ function Host()
                     break;
                     
                 case enetnat.Event.TYPE_RECEIVE:
-                    self.emit('message', event.peer(), event.packet(), event.channelID(), event.data());
+                	var packet = event.packet();
+                    self.emit('message', event.peer(), packet, event.channelID(), event.data());
+                    packet.destroy();
                     break;
                 }
 

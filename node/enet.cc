@@ -7,12 +7,6 @@
 #include <enet/enet.h>
 #include <cstring>
 
-#ifdef DEBUG
-#define debug(fmt, args...) fprintf(stderr, fmt, ##args)
-#else
-#define debug(fmt, args...)
-#endif
-
 #define MY_NODE_DEFINE_CONSTANT(target, name, value)                            \
        (target)->Set(v8::String::NewSymbol(name),                               \
                      v8::Integer::New(value),                                   \
@@ -37,32 +31,35 @@ public:
         : isSent(false)
     {
         packet = enet_packet_create(data, dataLength, flags);
-        debug(stderr, "%p Packet(%p, %d, %x) -- %p\n", this, data, dataLength, flags, packet);
     }
     
     Packet(enet_uint32 flags)
         : isSent(false)
     {
         packet = enet_packet_create(NULL, 0, flags);
-        debug(stderr, "%p Packet(%x) -- %p\n", this, flags, packet);
     }
     
     Packet() : packet(0), isSent(false)
     {
-        debug(stderr, "%p Packet() -- %p\n", this, packet);
+    
     }
     
     ~Packet()
     {
-        debug(stderr, "%p ~Packet() -- %p\n", this, packet);
-        if (packet && !isSent)
+        SetPacket(NULL);
+    }
+    
+    void SetPacket( ENetPacket* p )
+    {
+    	if (packet && !isSent)
         {
             enet_packet_destroy(packet);
         }
+        packet = p;
     }
     
     static v8::Persistent<v8::FunctionTemplate> s_ct;
-    
+   
     static void Init(v8::Handle<v8::Object> target)
     {
         v8::HandleScope scope;
@@ -74,6 +71,7 @@ public:
         NODE_SET_PROTOTYPE_METHOD(s_ct, "setData", SetData);
         NODE_SET_PROTOTYPE_METHOD(s_ct, "flags", Flags);
         NODE_SET_PROTOTYPE_METHOD(s_ct, "setFlags", SetFlags);
+        NODE_SET_PROTOTYPE_METHOD(s_ct, "destroy", Destroy);
         MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_RELIABLE", ENET_PACKET_FLAG_RELIABLE);
         MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_UNSEQUENCED", ENET_PACKET_FLAG_UNSEQUENCED);
         MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_NO_ALLOCATE", ENET_PACKET_FLAG_NO_ALLOCATE);
@@ -112,7 +110,10 @@ public:
             }
         }
         if (args.Length() == 0)
+        {
             packet = new Packet();
+        }
+        
         if (packet != NULL)
         {
             packet->Wrap(args.This());
@@ -124,7 +125,7 @@ public:
     {
         v8::Local<v8::Object> o = s_ct->InstanceTemplate()->NewInstance();
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(o);
-        packet->packet = enet_packet_create(p->data, p->dataLength, p->flags);
+        packet->SetPacket(p);
         return o;
     }
     
@@ -205,6 +206,15 @@ public:
         v8::Local<v8::Value> result;
         return scope.Close(result);
     }
+   
+    static v8::Handle<v8::Value> Destroy(const v8::Arguments& args)
+    {
+        v8::HandleScope scope;
+        Packet *packet = node::ObjectWrap::Unwrap<Packet>(args.This());
+        packet->SetPacket(0);
+        v8::Local<v8::Value> result;
+        return scope.Close(result);
+    }    
 };
 
 class Address: public node::ObjectWrap
@@ -890,6 +900,7 @@ public:
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         return scope.Close(v8::Int32::New(host->host->socket));
     }
+
 };
 
 }
