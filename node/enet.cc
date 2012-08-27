@@ -56,6 +56,7 @@ public:
             enet_packet_destroy(packet);
         }
         packet = p;
+        isSent = false;
     }
     
     static v8::Persistent<v8::FunctionTemplate> s_ct;
