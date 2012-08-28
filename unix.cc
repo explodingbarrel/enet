@@ -18,12 +18,14 @@
 #define ENET_BUILDING_LIB 1
 #include "enet/enet.h"
 
-#ifdef HAS_FCNTL
-#include <fcntl.h>
-#endif
-
 #ifdef __APPLE__
 #undef HAS_POLL
+#define HAS_SOCKLEN_T
+#define HAS_FCNTL
+#endif
+
+#ifdef HAS_FCNTL
+#include <fcntl.h>
 #endif
 
 #ifdef HAS_POLL
