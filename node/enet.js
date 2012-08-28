@@ -82,6 +82,11 @@ function Host()
 
 util.inherits(Host, events.EventEmitter);
 
+Host.prototype.compress = function()
+{
+	return this.host.compress();
+}
+
 Host.prototype.start_watcher = function()
 {
     if (!this.watcher_running)

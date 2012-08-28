@@ -735,6 +735,7 @@ public:
         NODE_SET_PROTOTYPE_METHOD(s_ct, "checkEvents", CheckEvents);
         NODE_SET_PROTOTYPE_METHOD(s_ct, "service", Service);
         NODE_SET_PROTOTYPE_METHOD(s_ct, "fd", FD);
+        NODE_SET_PROTOTYPE_METHOD(s_ct, "compress", Compress);
         target->Set(v8::String::NewSymbol("Host"), s_ct->GetFunction());
     }
     
@@ -900,6 +901,16 @@ public:
         v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         return scope.Close(v8::Int32::New(host->host->socket));
+    }
+    
+    static v8::Handle<v8::Value> Compress(const v8::Arguments& args)
+    {
+        v8::HandleScope scope;
+        Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
+        int ret = enet_host_compress_with_range_coder(host->host);
+        if (ret < 0)
+            return v8::ThrowException(v8::String::New("error setting up compressor"));
+        return scope.Close(v8::Int32::New(ret));
     }
 
 };

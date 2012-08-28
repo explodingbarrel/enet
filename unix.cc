@@ -20,8 +20,12 @@
 
 #ifdef __APPLE__
 #undef HAS_POLL
+#ifndef HAS_SOCKLEN_T 
 #define HAS_SOCKLEN_T
+#endif
+#ifndef HAS_FCNTL
 #define HAS_FCNTL
+#endif
 #endif
 
 #ifdef HAS_FCNTL
