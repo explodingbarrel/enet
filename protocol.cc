@@ -980,8 +980,13 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
 
        if (peer -> state == ENET_PEER_STATE_DISCONNECTED ||
            peer -> state == ENET_PEER_STATE_ZOMBIE ||
-           ((host -> receivedAddress.host != peer -> address.host ||
-             host -> receivedAddress.port != peer -> address.port) &&
+           ((host -> receivedAddress.host != peer -> address.host
+             /*
+              * JEH: disable port matching to handle bad firewalls that have very short lived NAT sessions
+             ||
+             host -> receivedAddress.port != peer -> address.port
+              */
+              ) &&
              peer -> address.host != ENET_HOST_BROADCAST) ||
            (peer -> outgoingPeerID < ENET_PROTOCOL_MAXIMUM_PEER_ID &&
             sessionID != peer -> incomingSessionID))
