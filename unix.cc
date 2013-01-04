@@ -196,7 +196,16 @@ enet_socket_listen (ENetSocket socket, int backlog)
 ENetSocket
 enet_socket_create (ENetSocketType type)
 {
-    return socket (PF_INET, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
+    ENetSocket sd = socket (PF_INET, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
+    
+    // disable any sig pipe exceptions 
+#ifdef SO_NOSIGPIPE
+    if (sd) {
+        int set = 1;
+        setsockopt(sd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+    }
+#endif
+    return sd;
 }
 
 int
