@@ -149,6 +149,7 @@ typedef struct _ENetOutgoingCommand
    enet_uint16  unreliableSequenceNumber;
    enet_uint32  sentTime;
    enet_uint32  roundTripTimeout;
+   enet_uint32  roundTripTimeoutInc;
    enet_uint32  roundTripTimeoutLimit;
    enet_uint32  fragmentOffset;
    enet_uint16  fragmentLength;
@@ -192,7 +193,7 @@ enum
    ENET_HOST_RECEIVE_BUFFER_SIZE          = 256 * 1024,
    ENET_HOST_SEND_BUFFER_SIZE             = 256 * 1024,
    ENET_HOST_BANDWIDTH_THROTTLE_INTERVAL  = 1000,
-   ENET_HOST_DEFAULT_MTU                  = 1400,
+   ENET_HOST_DEFAULT_MTU                  = 576,
 
    ENET_PEER_DEFAULT_ROUND_TRIP_TIME      = 500,
    ENET_PEER_DEFAULT_PACKET_THROTTLE      = 32,
@@ -205,7 +206,7 @@ enum
    ENET_PEER_PACKET_LOSS_INTERVAL         = 10000,
    ENET_PEER_WINDOW_SIZE_SCALE            = 64 * 1024,
    ENET_PEER_TIMEOUT_LIMIT                = 32,
-   ENET_PEER_TIMEOUT_MINIMUM              = 5000,
+   ENET_PEER_TIMEOUT_MINIMUM              = 10000,
    ENET_PEER_TIMEOUT_MAXIMUM              = 30000,
    ENET_PEER_PING_INTERVAL                = 500,
    ENET_PEER_UNSEQUENCED_WINDOWS          = 64,
@@ -255,6 +256,7 @@ typedef struct _ENetPeer
    enet_uint32   outgoingDataTotal;
    enet_uint32   lastSendTime;
    enet_uint32   lastReceiveTime;
+    enet_uint32  lastPacketTime;
    enet_uint32   nextTimeout;
    enet_uint32   earliestTimeout;
    enet_uint32   packetLossEpoch;
