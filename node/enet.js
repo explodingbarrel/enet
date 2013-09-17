@@ -5,8 +5,9 @@
 var util = require('util');
 var timers = require('timers');
 var events = require('events');
-var IOWatcher = process.binding('io_watcher').IOWatcher;
-var enetnat = require('../enet');
+var enetnat = require('../build/Release/enetnative.node');
+
+//var IOWatcher = process.binding('io_watcher').IOWatcher;
 
 module.exports.Address = enetnat.Address;
 module.exports.Peer = enetnat.Peer;
@@ -40,7 +41,7 @@ function Host()
     {
         throw Error('expected between 2 and 5 arguments')
     }
-    self.watcher = new IOWatcher();
+    //self.watcher = new IOWatcher();
     self.runloop = function() {
         try
         {
@@ -75,8 +76,8 @@ function Host()
             self.emit('error', e);
         }
     };
-    self.watcher.callback = self.runloop;
-    self.watcher.host = self;
+    //self.watcher.callback = self.runloop;
+    //self.watcher.host = self;
     self.watcher_running = false;
 }
 
@@ -91,9 +92,9 @@ Host.prototype.start_watcher = function()
 {
     if (!this.watcher_running)
     {
-        this.watcher.set(this.host.fd(), true, false);
-        this.watcher.start();
-        this.intervalId = timers.setInterval(this.runloop, 100);
+        //this.watcher.set(this.host.fd(), true, false);
+        //this.watcher.start();
+        this.intervalId = timers.setInterval(this.runloop, 5);
         this.watcher_running = true;
     }
 }
@@ -102,7 +103,7 @@ Host.prototype.stop_watcher = function()
 {
     if (this.watcher_running)
     {
-        this.watcher.stop();
+        //this.watcher.stop();
         timers.clearInterval(this.intervalId);
         this.watcher_running = false;
     }

@@ -1,13 +1,13 @@
 {
     "name" : "enet",
     "description" : "The enet networking library",
-    "url" : "http://memeo-inc.com/",
+    "url" : "http://enet.bespin.org",
     "keywords" : ["networking","peer-to-peer","enet"],
     "author" : "Memeo, Inc",
-    "contributors" : ["Casey Marshall <casey.marshall@memeo-inc.com>, Jeff Howell (jeff@explodingbarrelgames.com)"],
+    "contributors" : ["Lee Salzman, Casey Marshall <casey.marshall@memeo-inc.com>, Jeff Howell (jeff@kabam.com)"],
     "dependencies" : {},
     "version" : "0.0.1",
     "main" : "node/enet.js",
     "directories" : {},
-    "engines" : { "node" : ">=0.4.7" }
+    "engines" : { "node" : ">=0.10.0" }
 }

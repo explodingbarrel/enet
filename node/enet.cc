@@ -936,5 +936,5 @@ extern "C"
         enet_initialize();
     }
     
-    NODE_MODULE(enetnat, init);
+    NODE_MODULE(enetnative, init);
 }
