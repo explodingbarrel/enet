@@ -46,8 +46,10 @@ function Host()
         try
         {
             var event = self.host.service(0);
-            while (event != null)
+            var numEvents = 0;
+            while (event != null && ++numEvents < 100)
             {
+            	
                 switch (event.type())
                 {
                 case enetnat.Event.TYPE_NONE:
@@ -69,6 +71,10 @@ function Host()
                 }
 
                 event = self.host.service(0);
+            }
+            
+            if (self.watcher_running) {
+            	self.intervalId = setTimeout(self.runloop, 5);
             }
         }
         catch (e)
@@ -94,8 +100,8 @@ Host.prototype.start_watcher = function()
     {
         //this.watcher.set(this.host.fd(), true, false);
         //this.watcher.start();
-        this.intervalId = timers.setInterval(this.runloop, 5);
-        this.watcher_running = true;
+    	this.watcher_running = true;
+        this.runloop();
     }
 }
 
@@ -104,7 +110,7 @@ Host.prototype.stop_watcher = function()
     if (this.watcher_running)
     {
         //this.watcher.stop();
-        timers.clearInterval(this.intervalId);
+        clearTimeout(this.intervalId);
         this.watcher_running = false;
     }
 }
