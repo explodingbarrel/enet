@@ -9,7 +9,7 @@
         "node-gyp": ">= 2.0.1",
         "nan" : "1.8.4"
     },
-    "version" : "0.0.1",
+    "version" : "0.0.2",
     "main" : "node/enet.js",
     "directories" : {},
     "engines" : { "node" : ">=0.10.0" }
