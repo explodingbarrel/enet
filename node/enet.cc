@@ -1,15 +1,15 @@
 /* enet.cc -- node.js to enet wrapper.
    Copyright (C) 2011 Memeo, Inc. */
    
-#include <v8.h>
-#include <node.h>
-#include <node_buffer.h>
 #include <enet/enet.h>
 #include <cstring>
+#include <nan.h>
+
+using namespace v8;
 
 #define MY_NODE_DEFINE_CONSTANT(target, name, value)                            \
-       (target)->Set(v8::String::NewSymbol(name),                               \
-                     v8::Integer::New(value),                                   \
+       (target)->Set(NanNew<String>(name),                               \
+                     NanNew<v8::Integer>((int)value),                                   \
                      static_cast<v8::PropertyAttribute>(v8::ReadOnly|v8::DontDelete))
 
 namespace enet
@@ -60,29 +60,27 @@ public:
     }
     
     static v8::Persistent<v8::FunctionTemplate> s_ct;
-   
+
     static void Init(v8::Handle<v8::Object> target)
     {
-        v8::HandleScope scope;
-        v8::Local<v8::FunctionTemplate> t = v8::FunctionTemplate::New(New);
-        s_ct = v8::Persistent<v8::FunctionTemplate>::New(t);
-        s_ct->InstanceTemplate()->SetInternalFieldCount(1);
-        s_ct->SetClassName(v8::String::NewSymbol("Packet"));
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "data", Data);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setData", SetData);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "flags", Flags);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setFlags", SetFlags);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "destroy", Destroy);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_RELIABLE", ENET_PACKET_FLAG_RELIABLE);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_UNSEQUENCED", ENET_PACKET_FLAG_UNSEQUENCED);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_NO_ALLOCATE", ENET_PACKET_FLAG_NO_ALLOCATE);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "FLAG_UNRELIABLE_FRAGMENT", ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
-        target->Set(v8::String::NewSymbol("Packet"), s_ct->GetFunction());
+        v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>(New);
+        t->InstanceTemplate()->SetInternalFieldCount(1);
+        t->SetClassName(NanNew<String>("Packet"));
+        NODE_SET_PROTOTYPE_METHOD(t, "data", Data);
+        NODE_SET_PROTOTYPE_METHOD(t, "setData", SetData);
+        NODE_SET_PROTOTYPE_METHOD(t, "flags", Flags);
+        NODE_SET_PROTOTYPE_METHOD(t, "setFlags", SetFlags);
+        NODE_SET_PROTOTYPE_METHOD(t, "destroy", Destroy);
+        MY_NODE_DEFINE_CONSTANT(t, "FLAG_RELIABLE", ENET_PACKET_FLAG_RELIABLE);
+        MY_NODE_DEFINE_CONSTANT(t, "FLAG_UNSEQUENCED", ENET_PACKET_FLAG_UNSEQUENCED);
+        MY_NODE_DEFINE_CONSTANT(t, "FLAG_NO_ALLOCATE", ENET_PACKET_FLAG_NO_ALLOCATE);
+        MY_NODE_DEFINE_CONSTANT(t, "FLAG_UNRELIABLE_FRAGMENT", ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+        target->Set(NanNew<String>("Packet"), t->GetFunction());
+        NanAssignPersistent(s_ct,t);
     }
     
-    static v8::Handle<v8::Value> New(const v8::Arguments& args)
+    static NAN_METHOD(New)
     {
-        v8::HandleScope scope;
         Packet *packet = NULL;
         enet_uint32 flags = 0;
         if (args.Length() > 1)
@@ -119,47 +117,43 @@ public:
         {
             packet->Wrap(args.This());
         }
-        return args.This();
+        NanReturnValue(args.This());
     }
     
     static v8::Handle<v8::Value> WrapPacket(ENetPacket *p)
     {
-        v8::Local<v8::Object> o = s_ct->InstanceTemplate()->NewInstance();
+        v8::Local<v8::Object> o = NanNew(s_ct)->InstanceTemplate()->NewInstance();
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(o);
         packet->SetPacket(p);
         return o;
     }
     
-    static v8::Handle<v8::Value> Data(const v8::Arguments& args)
+    static NAN_METHOD(Data)
     {
-        v8::HandleScope scope;
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args.This());
         if (packet->isSent)
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("packet has been sent and is now invalid")));
+            NanThrowError("packet has been sent and is now invalid");
         }
-        node::Buffer* buffer = node::Buffer::New( (char*)packet->packet->data, packet->packet->dataLength);
-        return scope.Close(buffer->handle_);
+        NanReturnValue( NanNewBufferHandle((char*)packet->packet->data, packet->packet->dataLength) );
     }
     
-    static v8::Handle<v8::Value> Flags(const v8::Arguments& args)
+    static NAN_METHOD(Flags)
     {
-        v8::HandleScope scope;
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args.This());
         if (packet->isSent)
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("packet has been sent and is now invalid")));
+            NanThrowError("packet has been sent and is now invalid");
         }
-        return scope.Close(v8::Uint32::New(packet->packet->flags));
+        NanReturnValue( NanNew<Uint32>(packet->packet->flags));
     }
     
-    static v8::Handle<v8::Value> SetData(const v8::Arguments& args)
+    static NAN_METHOD(SetData)
     {
-        v8::HandleScope scope;
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args.This());
         if (packet->isSent)
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("packet has been sent and is now invalid")));
+            NanThrowError("packet has been sent and is now invalid");
         }
         if (args.Length() > 0)
         {
@@ -181,17 +175,15 @@ public:
         {
             enet_packet_resize(packet->packet, 0);
         }
-        v8::Local<v8::Value> result;
-        return scope.Close(result);
+        NanReturnValue(args.This());
     }
     
-    static v8::Handle<v8::Value> SetFlags(const v8::Arguments& args)
+    static NAN_METHOD(SetFlags)
     {
-        v8::HandleScope scope;
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args.This());
         if (packet->isSent)
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("packet has been sent and is now invalid")));
+            NanThrowError("packet has been sent and is now invalid");
         }
         if (args.Length() > 0)
         {
@@ -204,17 +196,14 @@ public:
                 packet->packet->flags = args[0]->Uint32Value();
             }
         }
-        v8::Local<v8::Value> result;
-        return scope.Close(result);
+        NanReturnValue(args.This());
     }
    
-    static v8::Handle<v8::Value> Destroy(const v8::Arguments& args)
+    static NAN_METHOD(Destroy)
     {
-        v8::HandleScope scope;
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args.This());
         packet->SetPacket(0);
-        v8::Local<v8::Value> result;
-        return scope.Close(result);
+        NanReturnValue(args.This());
     }    
 };
 
@@ -263,39 +252,39 @@ public:
     
     static void Init(v8::Handle<v8::Object> target)
     {
-        v8::HandleScope scope;
-        v8::Local<v8::FunctionTemplate> t = v8::FunctionTemplate::New(New);
-        s_ct = v8::Persistent<v8::FunctionTemplate>::New(t);
-        s_ct->InstanceTemplate()->SetInternalFieldCount(1);
-        s_ct->SetClassName(v8::String::NewSymbol("Address"));
+        v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>(New);
+        
+        t->InstanceTemplate()->SetInternalFieldCount(1);
+        t->SetClassName(NanNew<String>("Address"));
         // host -- the IP address, as an integer.
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "host", Host);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setHost", SetHost);
+        NODE_SET_PROTOTYPE_METHOD(t, "host", Host);
+        NODE_SET_PROTOTYPE_METHOD(t, "setHost", SetHost);
         // port -- the port number as an integer.
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "port", Port);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setPort", SetPort);
+        NODE_SET_PROTOTYPE_METHOD(t, "port", Port);
+        NODE_SET_PROTOTYPE_METHOD(t, "setPort", SetPort);
         // hostname -- the hostname associated with the address, if any
         // set looks up the address via DNS
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "hostname", Hostname);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setHostname", SetHostname);
+        NODE_SET_PROTOTYPE_METHOD(t, "hostname", Hostname);
+        NODE_SET_PROTOTYPE_METHOD(t, "setHostname", SetHostname);
         // address -- the IP address in dotted-decimal format
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "address", GetAddress);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setAddress", SetHostname); // uses the same function internally.
-        MY_NODE_DEFINE_CONSTANT(s_ct, "HOST_ANY", ENET_HOST_ANY);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "HOST_BROADCAST", ENET_HOST_BROADCAST);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "PORT_ANY", ENET_PORT_ANY);
-        target->Set(v8::String::NewSymbol("Address"), s_ct->GetFunction());
+        NODE_SET_PROTOTYPE_METHOD(t, "address", GetAddress);
+        NODE_SET_PROTOTYPE_METHOD(t, "setAddress", SetHostname); // uses the same function internally.
+        MY_NODE_DEFINE_CONSTANT(t, "HOST_ANY", ENET_HOST_ANY);
+        MY_NODE_DEFINE_CONSTANT(t, "HOST_BROADCAST", ENET_HOST_BROADCAST);
+        MY_NODE_DEFINE_CONSTANT(t, "PORT_ANY", ENET_PORT_ANY);
+        target->Set(NanNew<String>("Address"), t->GetFunction());
+
+        NanAssignPersistent(s_ct,t);
     }
     
-    static v8::Handle<v8::Value> New(const v8::Arguments& args)
+    static NAN_METHOD(New)
     {
-        v8::HandleScope scope;
         Address *addr = NULL;
         if (args.Length() == 1)
         {
             if (args[0]->IsString())
             {
-                v8::String::AsciiValue val(args[0]);
+                NanAsciiString val(args[0]);
                 addr = new Address(*val);
             }
             else if (args[0]->IsUint32())
@@ -311,7 +300,7 @@ public:
         {
             if (args[0]->IsString())
             {
-                v8::String::AsciiValue val(args[0]);
+                NanAsciiString val(args[0]);
                 if (args[1]->IsUint32())
                 {
                     addr = new Address(*val, (enet_uint16) args[1]->Uint32Value());
@@ -344,83 +333,73 @@ public:
         }
         else
         {
-            return v8::ThrowException(v8::String::New("invalid argument"));
+            NanThrowError("invalid argument");
         }
-        return scope.Close(args.This());
+        NanReturnValue(args.This());
     }
     
     static v8::Handle<v8::Value> WrapAddress(ENetAddress address)
     {
-        v8::Handle<v8::Object> o = s_ct->InstanceTemplate()->NewInstance();
+        v8::Handle<v8::Object> o = NanNew(s_ct)->InstanceTemplate()->NewInstance();
         Address *a = node::ObjectWrap::Unwrap<Address>(o);
         a->address = address;
         return o;        
     }
     
-    static v8::Handle<v8::Value> Host(const v8::Arguments& args)
+    static NAN_METHOD(Host)
     {
-        v8::HandleScope scope;
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
-        return scope.Close(v8::Uint32::New(address->address.host));
+        NanReturnValue( NanNew<Uint32>(address->address.host) );
     }
     
-    static v8::Handle<v8::Value> Port(const v8::Arguments& args)
+    static NAN_METHOD(Port)
     {
-        v8::HandleScope scope;
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
-        return scope.Close(v8::Int32::New(address->address.port));
+        NanReturnValue( NanNew<Uint32>(address->address.port) );
     }
     
-    static v8::Handle<v8::Value> Hostname(const v8::Arguments& args)
+    static NAN_METHOD(Hostname)
     {
-        v8::HandleScope scope;
         char buffer[256];
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
-        if (enet_address_get_host(&(address->address), buffer, 256) == 0)
-            return scope.Close(v8::String::New(buffer));
-        v8::Handle<v8::Value> ret;
-        return scope.Close(ret);
+        if (enet_address_get_host(&(address->address), buffer, 256) == 0) {
+            NanReturnValue(NanNew<String>(buffer));
+        }
+        NanReturnNull();
     }
     
-    static v8::Handle<v8::Value> GetAddress(const v8::Arguments& args)
+    static NAN_METHOD(GetAddress)
     {
-        v8::HandleScope scope;
         char buffer[256];
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
-        if (enet_address_get_host_ip(&(address->address), buffer, 256) == 0)
-            return scope.Close(v8::String::New(buffer));
-        v8::Handle<v8::Value> ret;
-        return scope.Close(ret);        
+        if (enet_address_get_host_ip(&(address->address), buffer, 256) == 0) {
+            NanReturnValue(NanNew<String>(buffer));
+        }
+        NanReturnNull();       
     }
     
-    static v8::Handle<v8::Value> SetHost(const v8::Arguments& args)
+    static NAN_METHOD(SetHost)
     {
-        v8::HandleScope scope;
-        v8::Handle<v8::Value> ret;
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
         if (args[0]->IsUint32())
         {
             address->address.host = args[0]->Uint32Value();
         }
-        scope.Close(ret);
+        NanReturnValue(args.This());
     }
 
-    static v8::Handle<v8::Value> SetPort(const v8::Arguments& args)
+    static NAN_METHOD(SetPort)
     {
-        v8::HandleScope scope;
-        v8::Handle<v8::Value> ret;
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
         if (args[0]->IsInt32())
         {
             address->address.port = (enet_uint16) args[0]->Int32Value();
         }
-        scope.Close(ret);
+        NanReturnValue(args.This());
     }
     
-    static v8::Handle<v8::Value> SetHostname(const v8::Arguments& args)
+    static NAN_METHOD(SetHostname)
     {
-        v8::HandleScope scope;
-        v8::Handle<v8::Value> ret;
         Address *address = node::ObjectWrap::Unwrap<Address>(args.This());
         bool success = false;
         if (args[0]->IsString())
@@ -429,7 +408,7 @@ public:
             if (enet_address_set_host(&(address->address), *utf8) == 0)
                 success = true;
         }
-        scope.Close(v8::Boolean::New(success));
+        NanReturnValue(NanNew<Boolean>(success));
     }
 };
 
@@ -447,155 +426,143 @@ public:
     
     static void Init(v8::Handle<v8::Object> target)
     {
-        v8::HandleScope scope;
-        v8::Local<v8::FunctionTemplate> t = v8::FunctionTemplate::New();
-        s_ct = v8::Persistent<v8::FunctionTemplate>::New(t);
-        s_ct->InstanceTemplate()->SetInternalFieldCount(1);
-        s_ct->SetClassName(v8::String::NewSymbol("Peer"));
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "send", Send);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "receive", Receive);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "reset", Reset);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "ping", Ping);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "disconnectNow", DisconnectNow);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "disconnect", Disconnect);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "disconnectLater", DisconnectLater);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "address", GetAddress);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "data", GetData);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setData", SetData);
-        target->Set(v8::String::NewSymbol("Peer"), s_ct->GetFunction());
+        v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>();
+        t->InstanceTemplate()->SetInternalFieldCount(1);
+        t->SetClassName(NanNew<String>("Peer"));
+        NODE_SET_PROTOTYPE_METHOD(t, "send", Send);
+        NODE_SET_PROTOTYPE_METHOD(t, "receive", Receive);
+        NODE_SET_PROTOTYPE_METHOD(t, "reset", Reset);
+        NODE_SET_PROTOTYPE_METHOD(t, "ping", Ping);
+        NODE_SET_PROTOTYPE_METHOD(t, "disconnectNow", DisconnectNow);
+        NODE_SET_PROTOTYPE_METHOD(t, "disconnect", Disconnect);
+        NODE_SET_PROTOTYPE_METHOD(t, "disconnectLater", DisconnectLater);
+        NODE_SET_PROTOTYPE_METHOD(t, "address", GetAddress);
+        NODE_SET_PROTOTYPE_METHOD(t, "data", GetData);
+        NODE_SET_PROTOTYPE_METHOD(t, "setData", SetData);
+        target->Set(NanNew<String>("Peer"), t->GetFunction());
+
+        NanAssignPersistent(s_ct, t);
     }
     
-    static v8::Handle<v8::Value> New(const v8::Arguments& args)
+    static NAN_METHOD(New)
     {
-        v8::HandleScope scope;
         Peer *peer = new Peer(NULL);
         peer->Wrap(args.This());
-        return scope.Close(args.This());
+        NanReturnValue(args.This());
     }
     
     static v8::Handle<v8::Value> WrapPeer(ENetPeer *p)
     {
         Peer *peer = new Peer(p);
-        v8::Local<v8::Object> o = s_ct->InstanceTemplate()->NewInstance();
+        v8::Local<v8::Object> o = NanNew(s_ct)->InstanceTemplate()->NewInstance();
         peer->Wrap(o);
         return o;
     }
     
-    static v8::Handle<v8::Value> Send(const v8::Arguments& args)
+    static NAN_METHOD(Send)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         if (args.Length() != 2 || !args[0]->IsInt32() || !args[1]->IsObject())
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("send requires two arguments, channel number, packet")));
+            NanThrowError("send requires two arguments, channel number, packet");
         }
         enet_uint8 channel = (enet_uint8) args[0]->Int32Value();
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args[1]->ToObject());
         if (enet_peer_send(peer->peer, channel, packet->packet) < 0)
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("enet.Peer.send error")));
+            NanThrowError("enet.Peer.send error");
         }
         packet->isSent = true;
-        return v8::Undefined();
+        NanReturnNull();
     }
     
-    static v8::Handle<v8::Value> Receive(const v8::Arguments& args)
+    static NAN_METHOD(Receive)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         enet_uint8 channelID = 0;
-        v8::Local<v8::Array> result = v8::Array::New(2);
+        v8::Local<v8::Array> result = NanNew<Array>(2);
         ENetPacket *packet = enet_peer_receive(peer->peer, &channelID);
         if (packet == NULL)
-            return scope.Close(v8::Null());
-        result->Set(0, v8::Int32::New(channelID));
+            NanReturnNull();
+        result->Set(0, NanNew<v8::Int32>(channelID));
         v8::Handle<v8::Value> wrapper = Packet::WrapPacket(packet);
         result->Set(1, wrapper);
-        return scope.Close(result);
+        NanReturnValue(result);
     }
     
-    static v8::Handle<v8::Value> Reset(const v8::Arguments& args)
+    static NAN_METHOD(Reset)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         enet_peer_reset(peer->peer);
-        return scope.Close(v8::Undefined());
+        NanReturnNull();
     }
     
-    static v8::Handle<v8::Value> Ping(const v8::Arguments& args)
+    static NAN_METHOD(Ping)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         enet_peer_ping(peer->peer);
-        return scope.Close(v8::Undefined());        
+       NanReturnNull();     
     }
     
-    static v8::Handle<v8::Value> DisconnectNow(const v8::Arguments& args)
+    static NAN_METHOD(DisconnectNow)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         enet_uint32 data = 0;
         if (args.Length() > 0)
             data = args[0]->Uint32Value();
         enet_peer_disconnect_now(peer->peer, data);
-        return scope.Close(v8::Undefined());        
+        NanReturnNull();
     }
 
-    static v8::Handle<v8::Value> Disconnect(const v8::Arguments& args)
+    static NAN_METHOD(Disconnect)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         enet_uint32 data = 0;
         if (args.Length() > 0)
             data = args[0]->Uint32Value();
         enet_peer_disconnect(peer->peer, data);
-        return scope.Close(v8::Undefined());        
+        NanReturnNull();     
     }
 
-    static v8::Handle<v8::Value> DisconnectLater(const v8::Arguments& args)
+    static NAN_METHOD(DisconnectLater)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         enet_uint32 data = 0;
         if (args.Length() > 0)
             data = args[0]->Uint32Value();
         enet_peer_disconnect_later(peer->peer, data);
-        return scope.Close(v8::Undefined());        
+        NanReturnNull();     
     }
     
-    static v8::Handle<v8::Value> GetAddress(const v8::Arguments& args)
+    static NAN_METHOD(GetAddress)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
-        return scope.Close(Address::WrapAddress(peer->peer->address));
+        NanReturnValue(Address::WrapAddress(peer->peer->address));
     }
     
-    static v8::Handle<v8::Value> GetData(const v8::Arguments& args)
+    static NAN_METHOD(GetData)
     {
-        v8::HandleScope scope;
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
         
         void* p = peer->peer->data;
         uint32_t* pp = (uint32_t*)&p;
         
-        return scope.Close(v8::Uint32::New( *pp ) );
+        NanReturnValue(NanNew<v8::Uint32>( *pp ) );
     }
     
-    static v8::Handle<v8::Value> SetData(const v8::Arguments& args)
+    static NAN_METHOD(SetData)
     {
-        v8::HandleScope scope;
-        
         uint32_t data = 0;
         if (args.Length() > 0)
             data = args[0]->Uint32Value();
             
         Peer *peer = node::ObjectWrap::Unwrap<Peer>(args.This());
-        peer->peer->data = (void*)data;
-        return scope.Close(v8::Undefined());   
+        peer->peer->data = reinterpret_cast<void*>(data);
+        NanReturnNull();     
     }
 };
 
-class Event : node::ObjectWrap
+class Event : public node::ObjectWrap
 {
 private:
     ENetEvent event;
@@ -609,74 +576,67 @@ public:
     
     static void Init(v8::Handle<v8::Object> target)
     {
-        v8::HandleScope scope;
-        v8::Local<v8::FunctionTemplate> t = v8::FunctionTemplate::New();
-        s_ct = v8::Persistent<v8::FunctionTemplate>::New(t);
-        s_ct->InstanceTemplate()->SetInternalFieldCount(1);
-        s_ct->SetClassName(v8::String::NewSymbol("Event"));
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "type", Type);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "peer", GetPeer);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "channelID", ChannelID);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "data", Data);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "packet", GetPacket);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "TYPE_NONE", ENET_EVENT_TYPE_NONE);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "TYPE_CONNECT", ENET_EVENT_TYPE_CONNECT);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "TYPE_DISCONNECT", ENET_EVENT_TYPE_DISCONNECT);
-        MY_NODE_DEFINE_CONSTANT(s_ct, "TYPE_RECEIVE", ENET_EVENT_TYPE_RECEIVE);
-        target->Set(v8::String::NewSymbol("Event"), s_ct->GetFunction());
+        v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>();
+        t->InstanceTemplate()->SetInternalFieldCount(1);
+        t->SetClassName(NanNew<String>("Event"));
+        NODE_SET_PROTOTYPE_METHOD(t, "type", Type);
+        NODE_SET_PROTOTYPE_METHOD(t, "peer", GetPeer);
+        NODE_SET_PROTOTYPE_METHOD(t, "channelID", ChannelID);
+        NODE_SET_PROTOTYPE_METHOD(t, "data", Data);
+        NODE_SET_PROTOTYPE_METHOD(t, "packet", GetPacket);
+        MY_NODE_DEFINE_CONSTANT(t, "TYPE_NONE", ENET_EVENT_TYPE_NONE);
+        MY_NODE_DEFINE_CONSTANT(t, "TYPE_CONNECT", ENET_EVENT_TYPE_CONNECT);
+        MY_NODE_DEFINE_CONSTANT(t, "TYPE_DISCONNECT", ENET_EVENT_TYPE_DISCONNECT);
+        MY_NODE_DEFINE_CONSTANT(t, "TYPE_RECEIVE", ENET_EVENT_TYPE_RECEIVE);
+        target->Set(NanNew<String>("Event"), t->GetFunction());
+        NanAssignPersistent(s_ct, t);
     }
     
     static v8::Handle<v8::Value> WrapEvent(ENetEvent e)
     {
         Event *event = new Event(e);
-        v8::Handle<v8::Object> o = s_ct->InstanceTemplate()->NewInstance();
+        v8::Handle<v8::Object> o = NanNew(s_ct)->InstanceTemplate()->NewInstance();
         event->Wrap(o);
         return o;
     }
     
-    static v8::Handle<v8::Value> Type(const v8::Arguments& args)
+    static NAN_METHOD(Type)
     {
-        v8::HandleScope scope;
         Event *e = node::ObjectWrap::Unwrap<Event>(args.This());
-        return scope.Close(v8::Int32::New(e->event.type));
+        NanReturnValue(NanNew<v8::Int32>(e->event.type));
     }
     
-    static v8::Handle<v8::Value> GetPeer(const v8::Arguments& args)
+    static NAN_METHOD(GetPeer)
     {
-        v8::HandleScope scope;
         Event *e = node::ObjectWrap::Unwrap<Event>(args.This());
         if (e->event.peer == NULL)
-            return scope.Close(v8::Null());
-        v8::Handle<v8::Value> result = Peer::WrapPeer(e->event.peer);
-        return scope.Close(result);
+            NanReturnNull();
+        NanReturnValue(Peer::WrapPeer(e->event.peer));
     }
     
-    static v8::Handle<v8::Value> ChannelID(const v8::Arguments& args)
+    static NAN_METHOD(ChannelID)
     {
-        v8::HandleScope scope;
         Event *e = node::ObjectWrap::Unwrap<Event>(args.This());
-        return scope.Close(v8::Int32::New(e->event.channelID));        
+        NanReturnValue(NanNew<v8::Int32>(e->event.channelID));        
     }
     
-    static v8::Handle<v8::Value> Data(const v8::Arguments& args)
+    static NAN_METHOD(Data)
     {
-        v8::HandleScope scope;
         Event *e = node::ObjectWrap::Unwrap<Event>(args.This());
-        return scope.Close(v8::Uint32::New(e->event.data));
+        NanReturnValue(NanNew<v8::Uint32>(e->event.data));     
     }
     
-    static v8::Handle<v8::Value> GetPacket(const v8::Arguments& args)
+    static NAN_METHOD(GetPacket)
     {
-        v8::HandleScope scope;
         Event *e = node::ObjectWrap::Unwrap<Event>(args.This());
-        if (e->event.packet == NULL)
-            return scope.Close(v8::Null());
-        v8::Handle<v8::Value> result = Packet::WrapPacket(e->event.packet);
-        return scope.Close(result);
+        if (e->event.packet == NULL){
+            NanReturnNull();
+        }
+        NanReturnValue(Packet::WrapPacket(e->event.packet));
     }
 };
 
-class Host : node::ObjectWrap
+class Host : public node::ObjectWrap
 {
 private:
     ENetHost *host;
@@ -717,33 +677,31 @@ public:
     
     static void Init(v8::Handle<v8::Object> target)
     {
-        v8::HandleScope scope;
-        v8::Local<v8::FunctionTemplate> t = v8::FunctionTemplate::New(New);
-        s_ct = v8::Persistent<v8::FunctionTemplate>::New(t);
-        s_ct->InstanceTemplate()->SetInternalFieldCount(1);
-        s_ct->SetClassName(v8::String::NewSymbol("Host"));
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "connect", Connect);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "broadcast", Broadcast);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "address", GetAddress);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "peerCount", PeerCount);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "channelLimit", ChannelLimit);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setChannelLimit", SetChannelLimit);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "incomingBandwidth", IncomingBandwidth);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "outgoingBandwidth", OutgoingBandwidth);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "setBandwidthLimit", SetBandwidthLimit);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "flush", Flush);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "checkEvents", CheckEvents);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "service", Service);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "fd", FD);
-        NODE_SET_PROTOTYPE_METHOD(s_ct, "compress", Compress);
-        target->Set(v8::String::NewSymbol("Host"), s_ct->GetFunction());
+        v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>(New);
+        t->InstanceTemplate()->SetInternalFieldCount(1);
+        t->SetClassName(NanNew<String>("Host"));
+        NODE_SET_PROTOTYPE_METHOD(t, "connect", Connect);
+        NODE_SET_PROTOTYPE_METHOD(t, "broadcast", Broadcast);
+        NODE_SET_PROTOTYPE_METHOD(t, "address", GetAddress);
+        NODE_SET_PROTOTYPE_METHOD(t, "peerCount", PeerCount);
+        NODE_SET_PROTOTYPE_METHOD(t, "channelLimit", ChannelLimit);
+        NODE_SET_PROTOTYPE_METHOD(t, "setChannelLimit", SetChannelLimit);
+        NODE_SET_PROTOTYPE_METHOD(t, "incomingBandwidth", IncomingBandwidth);
+        NODE_SET_PROTOTYPE_METHOD(t, "outgoingBandwidth", OutgoingBandwidth);
+        NODE_SET_PROTOTYPE_METHOD(t, "setBandwidthLimit", SetBandwidthLimit);
+        NODE_SET_PROTOTYPE_METHOD(t, "flush", Flush);
+        NODE_SET_PROTOTYPE_METHOD(t, "checkEvents", CheckEvents);
+        NODE_SET_PROTOTYPE_METHOD(t, "service", Service);
+        NODE_SET_PROTOTYPE_METHOD(t, "fd", FD);
+        NODE_SET_PROTOTYPE_METHOD(t, "compress", Compress);
+        target->Set(NanNew<String>("Host"), t->GetFunction());
+        NanAssignPersistent(s_ct, t);
     }
     
-    static v8::Handle<v8::Value> New(const v8::Arguments& args)
+    static NAN_METHOD(New)
     {
-        v8::HandleScope scope;
         if (args.Length() < 2)
-            return v8::ThrowException(v8::String::New("constructor takes at least two arguments"));
+            NanThrowError("constructor takes at least two arguments");
         Address *addr = node::ObjectWrap::Unwrap<Address>(args[0]->ToObject());
         size_t peerCount = args[1]->Int32Value();
         size_t channelCount = 0;
@@ -759,129 +717,114 @@ public:
         {
             Host *host = new Host(addr, peerCount, channelCount, incomingBW, outgoingBW);
             host->Wrap(args.This());
-            return scope.Close(args.This());
+            NanReturnValue(args.This());
         }
         catch (...)
         {
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("could not create host")));
+            NanThrowError("could not create host");
         }
     }
-    
-    static v8::Handle<v8::Value> Connect(const v8::Arguments& args)
+
+    static NAN_METHOD(Connect)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         if (args.Length() < 2 || !args[0]->IsObject() || !args[1]->IsInt32())
-            return v8::ThrowException(v8::Exception::Error(v8::String::New("invalid argument")));
+            NanThrowError("invalid argument");
         Address *address = node::ObjectWrap::Unwrap<Address>(args[0]->ToObject());
         size_t channelCount = args[1]->Int32Value();
         enet_uint32 data = 0;
         if (args.Length() > 2)
         {
             if (!args[2]->IsUint32())
-                return v8::ThrowException(v8::Exception::Error(v8::String::New("invalid data argument")));
+                NanThrowError("invalid data argument");
             data = args[2]->Uint32Value();
         }
         ENetPeer *ep = enet_host_connect(host->host,
             (const ENetAddress *) &(address->address), channelCount, data);
-        if (ep == NULL)
-            return v8::Null();
-        return scope.Close(Peer::WrapPeer(ep));
+        if (ep == NULL) {
+            NanReturnNull();
+        }
+        NanReturnValue(Peer::WrapPeer(ep));
     }
     
-    static v8::Handle<v8::Value> Broadcast(const v8::Arguments& args)
+    static NAN_METHOD(Broadcast)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         enet_uint8 channelID = args[0]->Int32Value();
         Packet *packet = node::ObjectWrap::Unwrap<Packet>(args[1]->ToObject());
         enet_host_broadcast(host->host, channelID, packet->packet);
-        return v8::Undefined();
     }
     
-    static v8::Handle<v8::Value> GetAddress(const v8::Arguments& args)
+    static NAN_METHOD(GetAddress)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         v8::Handle<v8::Value> result = Address::WrapAddress(host->address->address);
-        return scope.Close(result);
+        NanReturnValue(result);
     }
     
-    static v8::Handle<v8::Value> PeerCount(const v8::Arguments& args)
+    static NAN_METHOD(PeerCount)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
-        return scope.Close(v8::Int32::New(host->peerCount));
+        NanReturnValue(NanNew<Int32>( (int32_t)host->peerCount));
     }
 
-    static v8::Handle<v8::Value> ChannelLimit(const v8::Arguments& args)
+    static NAN_METHOD(ChannelLimit)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
-        return scope.Close(v8::Int32::New(host->channelLimit));
+        NanReturnValue(NanNew<Int32>( (int32_t) host->channelLimit));
     }
     
-    static v8::Handle<v8::Value> SetChannelLimit(const v8::Arguments& args)
+    static NAN_METHOD(SetChannelLimit)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         size_t newLimit = args[0]->Int32Value();
         enet_host_channel_limit(host->host, newLimit);
         host->channelLimit = newLimit;
-        return v8::Undefined();
     }
 
-    static v8::Handle<v8::Value> IncomingBandwidth(const v8::Arguments& args)
+    static NAN_METHOD(IncomingBandwidth)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
-        return scope.Close(v8::Uint32::New(host->incomingBandwidth));
+        NanReturnValue(NanNew<Uint32>(host->incomingBandwidth));
     }
 
-    static v8::Handle<v8::Value> OutgoingBandwidth(const v8::Arguments& args)
+    static NAN_METHOD(OutgoingBandwidth)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
-        return scope.Close(v8::Uint32::New(host->outgoingBandwidth));
+        NanReturnValue(NanNew<Uint32>(host->outgoingBandwidth));
     }
     
-    static v8::Handle<v8::Value> SetBandwidthLimit(const v8::Arguments& args)
+    static NAN_METHOD(SetBandwidthLimit)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         enet_uint32 inbw = args[0]->Uint32Value();
         enet_uint32 outbw = args[1]->Uint32Value();
         enet_host_bandwidth_limit(host->host, inbw, outbw);
         host->incomingBandwidth = inbw;
         host->outgoingBandwidth = outbw;
-        return v8::Undefined();
     }
     
-    static v8::Handle<v8::Value> Flush(const v8::Arguments& args)
+    static NAN_METHOD(Flush)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         enet_host_flush(host->host);
-        return v8::Undefined();
     }
     
-    static v8::Handle<v8::Value> CheckEvents(const v8::Arguments& args)
+    static NAN_METHOD(CheckEvents)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         ENetEvent event;
         int ret = enet_host_check_events(host->host, &event);
         if (ret < 0)
-            return v8::ThrowException(v8::String::New("error checking events"));
+            NanThrowError("error checking events");
         if (ret < 1)
-            return v8::Null();
+            NanReturnNull();
         v8::Handle<v8::Value> result = Event::WrapEvent(event);
-        return scope.Close(result);
+        NanReturnValue(result);
     }
     
-    static v8::Handle<v8::Value> Service(const v8::Arguments& args)
+    static NAN_METHOD(Service)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         enet_uint32 timeout = 0;
         if (args.Length() > 0)
@@ -889,28 +832,26 @@ public:
         ENetEvent event;
         int ret = enet_host_service(host->host, &event, timeout);
         if (ret < 0)
-            return v8::ThrowException(v8::String::New("error servicing host"));
+            NanThrowError("error servicing host");
         if (ret < 1)
-            return v8::Null();
+            NanReturnNull();
         v8::Handle<v8::Value> result = Event::WrapEvent(event);
-        return scope.Close(result);        
+        NanReturnValue(result); 
     }
     
-    static v8::Handle<v8::Value> FD(const v8::Arguments& args)
+    static NAN_METHOD(FD)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
-        return scope.Close(v8::Int32::New(host->host->socket));
+        NanReturnValue(NanNew<Int32>(host->host->socket));
     }
     
-    static v8::Handle<v8::Value> Compress(const v8::Arguments& args)
+    static NAN_METHOD(Compress)
     {
-        v8::HandleScope scope;
         Host *host = node::ObjectWrap::Unwrap<Host>(args.This());
         int ret = enet_host_compress_with_range_coder(host->host);
         if (ret < 0)
-            return v8::ThrowException(v8::String::New("error setting up compressor"));
-        return scope.Close(v8::Int32::New(ret));
+            NanThrowError("error setting up compressor");
+        NanReturnValue(NanNew<Int32>(ret));
     }
 
 };

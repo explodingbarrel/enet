@@ -32,3 +32,4 @@ enet.node
 build/
 android/obj/
 android/libs/
+node_modules

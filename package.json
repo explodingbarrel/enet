@@ -5,7 +5,10 @@
     "keywords" : ["networking","peer-to-peer","enet"],
     "author" : "Memeo, Inc",
     "contributors" : ["Lee Salzman, Casey Marshall <casey.marshall@memeo-inc.com>, Jeff Howell (jeff@kabam.com)"],
-    "dependencies" : {},
+    "dependencies" : {
+        "node-gyp": ">= 2.0.1",
+        "nan" : "1.8.4"
+    },
     "version" : "0.0.1",
     "main" : "node/enet.js",
     "directories" : {},
