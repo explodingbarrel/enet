@@ -119,7 +119,7 @@ enet_address_set_host (ENetAddress * address, const char * name)
     if (error_code != 0) return error_code;
     if (result_box == NULL) return -1;
 
-    memcopy(&address, result_box -> ai_addr, result_box -> ai_addrlen);
+    memcpy(&address, result_box -> ai_addr, result_box -> ai_addrlen);
     address -> port = ENET_NET_TO_HOST_16 (address -> port);
     return error_code;
 }
@@ -127,7 +127,7 @@ enet_address_set_host (ENetAddress * address, const char * name)
 int
 enet_address_get_host_ip (const ENetAddress * address, char * name, size_t nameLength)
 {
-    void * host_ptr;
+    const void * host_ptr;
     switch (address -> family) {
         case AF_INET:
              host_ptr = & address -> ip.v4.host;
@@ -159,7 +159,7 @@ enet_socket_bind (ENetSocket socket, const ENetAddress * address)
     const size_t length = enet_address_get_size (address);
     ENetAddress * clone;
 
-    memcopy (& clone, address, length);
+    memcpy (& clone, address, length);
     clone -> port = ENET_HOST_TO_NET_16 (address -> port);
 
     return bind (socket, (struct sockaddr *) clone, length);
@@ -241,7 +241,7 @@ enet_socket_connect (ENetSocket socket, const ENetAddress * address)
     size_t length = enet_address_get_size (address);
     ENetAddress * clone;
 
-    memcopy (& clone, address, length);
+    memcpy (& clone, address, length);
     clone -> port = ENET_HOST_TO_NET_16 (address -> port);
 
     result = connect (socket, (struct sockaddr *) & clone, length);
@@ -301,7 +301,7 @@ enet_socket_send (ENetSocket socket,
         msgHdr.msg_name = & address_clone;
         msgHdr.msg_namelen = enet_address_get_size (address);
 
-        memcopy (& address_clone, address, msgHdr.msg_namelen);
+        memcpy (& address_clone, address, msgHdr.msg_namelen);
 
         address_clone.port = ENET_HOST_TO_NET_16 (address -> port);
     }
