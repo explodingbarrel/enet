@@ -5,15 +5,18 @@
 #ifndef __ENET_WIN32_H__
 #define __ENET_WIN32_H__
 
+#ifdef _MSC_VER
 #ifdef ENET_BUILDING_LIB
 #pragma warning (disable: 4996) // 'strncpy' was declared deprecated
 #pragma warning (disable: 4267) // size_t to int conversion
 #pragma warning (disable: 4244) // 64bit to 32bit int
 #pragma warning (disable: 4018) // signed/unsigned mismatch
 #endif
+#endif
 
 #include <stdlib.h>
 #include <winsock2.h>
+#include <ws2tcpip.h> // previously not included on MinGW for some reason
 
 typedef SOCKET ENetSocket;
 
@@ -36,8 +39,8 @@ typedef struct
 
 #define ENET_CALLBACK __cdecl
 
-#if defined ENET_DLL
-#if defined ENET_BUILDING_LIB
+#ifdef ENET_DLL
+#ifdef ENET_BUILDING_LIB
 #define ENET_API __declspec( dllexport )
 #else
 #define ENET_API __declspec( dllimport )

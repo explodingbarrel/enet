@@ -32,6 +32,30 @@ enet_protocol_command_size (enet_uint8 commandNumber)
     return commandSizes [commandNumber & ENET_PROTOCOL_COMMAND_MASK];
 }
 
+static void
+enet_protocol_change_state (ENetHost * host, ENetPeer * peer, ENetPeerState state)
+{
+    if (state == ENET_PEER_STATE_CONNECTED || state == ENET_PEER_STATE_DISCONNECT_LATER)
+      enet_peer_on_connect (peer);
+    else
+      enet_peer_on_disconnect (peer);
+
+    peer -> state = state;
+}
+
+static void
+enet_protocol_dispatch_state (ENetHost * host, ENetPeer * peer, ENetPeerState state)
+{
+    enet_protocol_change_state (host, peer, state);
+
+    if (! peer -> needsDispatch)
+    {
+       enet_list_insert (enet_list_end (& host -> dispatchQueue), & peer -> dispatchList);
+
+       peer -> needsDispatch = 1;
+    }
+}
+
 static int
 enet_protocol_dispatch_incoming_commands (ENetHost * host, ENetEvent * event)
 {
@@ -45,7 +69,7 @@ enet_protocol_dispatch_incoming_commands (ENetHost * host, ENetEvent * event)
        {
        case ENET_PEER_STATE_CONNECTION_PENDING:
        case ENET_PEER_STATE_CONNECTION_SUCCEEDED:
-           peer -> state = ENET_PEER_STATE_CONNECTED;
+           enet_protocol_change_state (host, peer, ENET_PEER_STATE_CONNECTED);
 
            event -> type = ENET_EVENT_TYPE_CONNECT;
            event -> peer = peer;
@@ -83,7 +107,9 @@ enet_protocol_dispatch_incoming_commands (ENetHost * host, ENetEvent * event)
            }
 
            return 1;
-          default: break;
+
+       default:
+           break;
        }
     }
 
@@ -91,26 +117,13 @@ enet_protocol_dispatch_incoming_commands (ENetHost * host, ENetEvent * event)
 }
 
 static void
-enet_protocol_dispatch_state (ENetHost * host, ENetPeer * peer, ENetPeerState state)
-{
-    peer -> state = state;
-
-    if (! peer -> needsDispatch)
-    {
-       enet_list_insert (enet_list_end (& host -> dispatchQueue), & peer -> dispatchList);
-
-       peer -> needsDispatch = 1;
-    }    
-}
-    
-static void
 enet_protocol_notify_connect (ENetHost * host, ENetPeer * peer, ENetEvent * event)
 {
     host -> recalculateBandwidthLimits = 1;
 
     if (event != NULL)
     {
-        peer -> state = ENET_PEER_STATE_CONNECTED;
+        enet_protocol_change_state (host, peer, ENET_PEER_STATE_CONNECTED);
 
         event -> type = ENET_EVENT_TYPE_CONNECT;
         event -> peer = peer;
@@ -161,7 +174,11 @@ enet_protocol_remove_sent_unreliable_commands (ENetPeer * peer)
            -- outgoingCommand -> packet -> referenceCount;
 
            if (outgoingCommand -> packet -> referenceCount == 0)
+           {
+              outgoingCommand -> packet -> flags |= ENET_PACKET_FLAG_SENT;
+
              enet_packet_destroy (outgoingCommand -> packet);
+        }
         }
 
         enet_free (outgoingCommand);
@@ -208,6 +225,9 @@ enet_protocol_remove_sent_reliable_command (ENetPeer * peer, enet_uint16 reliabl
        wasSent = 0;
     }
 
+    if (outgoingCommand == NULL)
+      return ENET_PROTOCOL_COMMAND_NONE;
+
     if (channelID < peer -> channelCount)
     {
        ENetChannel * channel = & peer -> channels [channelID];
@@ -232,7 +252,11 @@ enet_protocol_remove_sent_reliable_command (ENetPeer * peer, enet_uint16 reliabl
        -- outgoingCommand -> packet -> referenceCount;
 
        if (outgoingCommand -> packet -> referenceCount == 0)
+       {
+          outgoingCommand -> packet -> flags |= ENET_PACKET_FLAG_SENT;
+
          enet_packet_destroy (outgoingCommand -> packet);
+    }
     }
 
     enet_free (outgoingCommand);
@@ -268,8 +292,7 @@ enet_protocol_handle_connect (ENetHost * host, ENetProtocolHeader * header, ENet
          ++ currentPeer)
     {
         if (currentPeer -> state != ENET_PEER_STATE_DISCONNECTED &&
-            currentPeer -> address.host == host -> receivedAddress.host &&
-            currentPeer -> address.port == host -> receivedAddress.port &&
+            ENET_ADDRESS_COMPARE(&(currentPeer -> address), &(host -> receivedAddress)) &&
             currentPeer -> connectID == command -> connect.connectID)
           return NULL;
     }
@@ -737,14 +760,26 @@ enet_protocol_handle_send_unreliable_fragment (ENetHost * host, ENetPeer * peer,
 static int
 enet_protocol_handle_ping (ENetHost * host, ENetPeer * peer, const ENetProtocol * command)
 {
+    if (peer -> state != ENET_PEER_STATE_CONNECTED && peer -> state != ENET_PEER_STATE_DISCONNECT_LATER)
+      return -1;
+
     return 0;
 }
 
 static int
 enet_protocol_handle_bandwidth_limit (ENetHost * host, ENetPeer * peer, const ENetProtocol * command)
 {
+    if (peer -> state != ENET_PEER_STATE_CONNECTED && peer -> state != ENET_PEER_STATE_DISCONNECT_LATER)
+      return -1;
+
+    if (peer -> incomingBandwidth != 0)
+      -- host -> bandwidthLimitedPeers;
+
     peer -> incomingBandwidth = ENET_NET_TO_HOST_32 (command -> bandwidthLimit.incomingBandwidth);
     peer -> outgoingBandwidth = ENET_NET_TO_HOST_32 (command -> bandwidthLimit.outgoingBandwidth);
+
+    if (peer -> incomingBandwidth != 0)
+      ++ host -> bandwidthLimitedPeers;
 
     if (peer -> incomingBandwidth == 0 && host -> outgoingBandwidth == 0)
       peer -> windowSize = ENET_PROTOCOL_MAXIMUM_WINDOW_SIZE;
@@ -764,6 +799,9 @@ enet_protocol_handle_bandwidth_limit (ENetHost * host, ENetPeer * peer, const EN
 static int
 enet_protocol_handle_throttle_configure (ENetHost * host, ENetPeer * peer, const ENetProtocol * command)
 {
+    if (peer -> state != ENET_PEER_STATE_CONNECTED && peer -> state != ENET_PEER_STATE_DISCONNECT_LATER)
+      return -1;
+
     peer -> packetThrottleInterval = ENET_NET_TO_HOST_32 (command -> throttleConfigure.packetThrottleInterval);
     peer -> packetThrottleAcceleration = ENET_NET_TO_HOST_32 (command -> throttleConfigure.packetThrottleAcceleration);
     peer -> packetThrottleDeceleration = ENET_NET_TO_HOST_32 (command -> throttleConfigure.packetThrottleDeceleration);
@@ -774,7 +812,7 @@ enet_protocol_handle_throttle_configure (ENetHost * host, ENetPeer * peer, const
 static int
 enet_protocol_handle_disconnect (ENetHost * host, ENetPeer * peer, const ENetProtocol * command)
 {
-    if (peer -> state == ENET_PEER_STATE_ZOMBIE || peer -> state == ENET_PEER_STATE_ACKNOWLEDGING_DISCONNECT)
+    if (peer -> state == ENET_PEER_STATE_DISCONNECTED || peer -> state == ENET_PEER_STATE_ZOMBIE || peer -> state == ENET_PEER_STATE_ACKNOWLEDGING_DISCONNECT)
       return 0;
 
     enet_peer_reset_queues (peer);
@@ -790,7 +828,7 @@ enet_protocol_handle_disconnect (ENetHost * host, ENetPeer * peer, const ENetPro
     }
     else
     if (command -> header.command & ENET_PROTOCOL_COMMAND_FLAG_ACKNOWLEDGE)
-      peer -> state = ENET_PEER_STATE_ACKNOWLEDGING_DISCONNECT;
+      enet_protocol_change_state (host, peer, ENET_PEER_STATE_ACKNOWLEDGING_DISCONNECT);
     else
       enet_protocol_dispatch_state (host, peer, ENET_PEER_STATE_ZOMBIE);
 
@@ -807,6 +845,9 @@ enet_protocol_handle_acknowledge (ENetHost * host, ENetEvent * event, ENetPeer *
            receivedSentTime,
            receivedReliableSequenceNumber;
     ENetProtocolCommand commandNumber;
+
+    if (peer -> state == ENET_PEER_STATE_DISCONNECTED || peer -> state == ENET_PEER_STATE_ZOMBIE)
+      return 0;
 
     receivedSentTime = ENET_NET_TO_HOST_16 (command -> acknowledge.receivedSentTime);
     receivedSentTime |= host -> serviceTime & 0xFFFF0000;
@@ -878,7 +919,9 @@ enet_protocol_handle_acknowledge (ENetHost * host, ENetEvent * event, ENetPeer *
            enet_list_empty (& peer -> sentReliableCommands))
          enet_peer_disconnect (peer, peer -> eventData);
        break;
-    default: break;
+
+    default:
+       break;
     }
    
     return 0;
@@ -982,11 +1025,8 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
 
        if (peer -> state == ENET_PEER_STATE_DISCONNECTED ||
            peer -> state == ENET_PEER_STATE_ZOMBIE ||
-           ((host -> receivedAddress.host != peer -> address.host
-             ||
-             host -> receivedAddress.port != peer -> address.port
-              ) &&
-             peer -> address.host != ENET_HOST_BROADCAST) ||
+           (!ENET_ADDRESS_COMPARE(&(peer -> address), &(host -> receivedAddress)) &&
+            peer -> address.ip.v4.host != ENET_HOST_BROADCAST) || // BAD: IGNORES IPv6 CASE!
            (peer -> outgoingPeerID < ENET_PROTOCOL_MAXIMUM_PEER_ID &&
             sessionID != peer -> incomingSessionID))
          return 0;
@@ -1028,10 +1068,22 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
        
     if (peer != NULL)
     {
-       peer -> address.host = host -> receivedAddress.host;
        peer -> address.port = host -> receivedAddress.port;
        peer -> incomingDataTotal += host -> receivedDataLength;
-        peer->lastPacketTime = host->serviceTime;
+
+       switch (peer -> address.family)
+       {
+       case AF_INET:
+           peer -> address.ip.v4.host = host -> receivedAddress.ip.v4.host;
+           break;
+       case AF_INET6:
+           peer -> address.ip.v6.flow_info = host -> receivedAddress.ip.v6.flow_info;
+           peer -> address.ip.v6.scope_id  = host -> receivedAddress.ip.v6.scope_id;
+           {
+               int i = 0;
+               for (; i < 4; i++) peer -> address.ip.v6.host[i] = host -> receivedAddress.ip.v6.host[i];
+           }
+       }
     }
     
     currentData = host -> receivedData + headerSize;
@@ -1061,7 +1113,7 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
          
        command -> header.reliableSequenceNumber = ENET_NET_TO_HOST_16 (command -> header.reliableSequenceNumber);
 
-       switch (command -> header.command & ENET_PROTOCOL_COMMAND_MASK)
+       switch (commandNumber)
        {
        case ENET_PROTOCOL_COMMAND_ACKNOWLEDGE:
           if (enet_protocol_handle_acknowledge (host, event, peer, command))
@@ -1069,6 +1121,8 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
           break;
 
        case ENET_PROTOCOL_COMMAND_CONNECT:
+          if (peer != NULL)
+            goto commandError;
           peer = enet_protocol_handle_connect (host, header, command);
           if (peer == NULL)
             goto commandError;
@@ -1142,6 +1196,8 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
            {
            case ENET_PEER_STATE_DISCONNECTING:
            case ENET_PEER_STATE_ACKNOWLEDGING_CONNECT:
+           case ENET_PEER_STATE_DISCONNECTED:
+           case ENET_PEER_STATE_ZOMBIE:
               break;
 
            case ENET_PEER_STATE_ACKNOWLEDGING_DISCONNECT:
@@ -1191,6 +1247,24 @@ enet_protocol_receive_incoming_commands (ENetHost * host, ENetEvent * event)
        host -> totalReceivedData += receivedLength;
        host -> totalReceivedPackets ++;
  
+       if (host -> intercept != NULL)
+       {
+          switch (host -> intercept (host, event))
+          {
+          case 1:
+             if (event != NULL && event -> type != ENET_EVENT_TYPE_NONE)
+               return 1;
+
+             continue;
+
+          case -1:
+             return -1;
+
+          default:
+             break;
+          }
+       }
+
        switch (enet_protocol_handle_incoming_commands (host, event))
        {
        case 1:
@@ -1214,6 +1288,7 @@ enet_protocol_send_acknowledgements (ENetHost * host, ENetPeer * peer)
     ENetBuffer * buffer = & host -> buffers [host -> bufferCount];
     ENetAcknowledgement * acknowledgement;
     ENetListIterator currentAcknowledgement;
+    enet_uint16 reliableSequenceNumber;
   
     currentAcknowledgement = enet_list_begin (& peer -> acknowledgements);
          
@@ -1237,9 +1312,12 @@ enet_protocol_send_acknowledgements (ENetHost * host, ENetPeer * peer)
 
        host -> packetSize += buffer -> dataLength;
  
+       reliableSequenceNumber = ENET_HOST_TO_NET_16 (acknowledgement -> command.header.reliableSequenceNumber);
+
        command -> header.command = ENET_PROTOCOL_COMMAND_ACKNOWLEDGE;
        command -> header.channelID = acknowledgement -> command.header.channelID;
-       command -> acknowledge.receivedReliableSequenceNumber = ENET_HOST_TO_NET_16 (acknowledgement -> command.header.reliableSequenceNumber);
+       command -> header.reliableSequenceNumber = reliableSequenceNumber;
+       command -> acknowledge.receivedReliableSequenceNumber = reliableSequenceNumber;
        command -> acknowledge.receivedSentTime = ENET_HOST_TO_NET_16 (acknowledgement -> sentTime);
   
        if ((acknowledgement -> command.header.command & ENET_PROTOCOL_COMMAND_MASK) == ENET_PROTOCOL_COMMAND_DISCONNECT)
@@ -1777,7 +1855,9 @@ enet_host_service (ENetHost * host, ENetEvent * event, enet_uint32 timeout)
             return 1;
 
         case -1:
+#ifdef ENET_DEBUG
             perror ("Error dispatching incoming packets");
+#endif
 
             return -1;
 
@@ -1801,7 +1881,9 @@ enet_host_service (ENetHost * host, ENetEvent * event, enet_uint32 timeout)
           return 1;
 
        case -1:
+#ifdef ENET_DEBUG
           perror ("Error sending outgoing packets");
+#endif
 
           return -1;
 
@@ -1815,7 +1897,9 @@ enet_host_service (ENetHost * host, ENetEvent * event, enet_uint32 timeout)
           return 1;
 
        case -1:
+#ifdef ENET_DEBUG
           perror ("Error receiving incoming packets");
+#endif
 
           return -1;
 
@@ -1829,7 +1913,9 @@ enet_host_service (ENetHost * host, ENetEvent * event, enet_uint32 timeout)
           return 1;
 
        case -1:
+#ifdef ENET_DEBUG
           perror ("Error sending outgoing packets");
+#endif
 
           return -1;
 
@@ -1845,7 +1931,9 @@ enet_host_service (ENetHost * host, ENetEvent * event, enet_uint32 timeout)
              return 1;
 
           case -1:
+#ifdef ENET_DEBUG
              perror ("Error dispatching incoming packets");
+#endif
 
              return -1;
 
@@ -1854,18 +1942,22 @@ enet_host_service (ENetHost * host, ENetEvent * event, enet_uint32 timeout)
           }
        }
 
+       do
+       {
        host -> serviceTime = enet_time_get ();
 
        if (ENET_TIME_GREATER_EQUAL (host -> serviceTime, timeout))
          return 0;
 
-       waitCondition = ENET_SOCKET_WAIT_RECEIVE;
+          waitCondition = ENET_SOCKET_WAIT_RECEIVE | ENET_SOCKET_WAIT_INTERRUPT;
 
        if (enet_socket_wait (host -> socket, & waitCondition, ENET_TIME_DIFFERENCE (timeout, host -> serviceTime)) != 0)
          return -1;
+       }
+       while (waitCondition & ENET_SOCKET_WAIT_INTERRUPT);
        
        host -> serviceTime = enet_time_get ();
-    } while (waitCondition == ENET_SOCKET_WAIT_RECEIVE);
+    } while (waitCondition & ENET_SOCKET_WAIT_RECEIVE);
 
     return 0; 
 }
