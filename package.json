@@ -6,10 +6,10 @@
     "author" : "Memeo, Inc",
     "contributors" : ["Lee Salzman, Casey Marshall <casey.marshall@memeo-inc.com>, Jeff Howell (jeff@kabam.com)"],
     "dependencies" : {
-        "node-gyp": ">= 2.0.1",
-        "nan" : "1.8.4"
+        "node-gyp": "latest",
+        "nan" : "2.3.5"
     },
-    "version" : "0.0.2",
+    "version" : "1.0.0",
     "main" : "node/enet.js",
     "directories" : {},
     "engines" : { "node" : ">=0.10.0" }
