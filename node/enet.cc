@@ -120,7 +120,7 @@ public:
         info.GetReturnValue().Set(info.This());
     }
     
-    static v8::Handle<v8::Value> WrapPacket(ENetPacket *p)
+    static v8::Local<v8::Value> WrapPacket(ENetPacket *p)
     {
         v8::Local<v8::Object> o = Nan::NewInstance(Nan::New(s_ct)->InstanceTemplate()).ToLocalChecked();
         Packet *packet = Nan::ObjectWrap::Unwrap<Packet>(o);
@@ -338,7 +338,7 @@ public:
         info.GetReturnValue().Set(info.This());
     }
     
-    static v8::Handle<v8::Value> WrapAddress(ENetAddress address)
+    static v8::Local<v8::Value> WrapAddress(ENetAddress address)
     {
         v8::Handle<v8::Object> o = Nan::NewInstance(Nan::New(s_ct)->InstanceTemplate()).ToLocalChecked();
         Address *a = Nan::ObjectWrap::Unwrap<Address>(o);
@@ -451,7 +451,7 @@ public:
         info.GetReturnValue().Set(info.This());
     }
     
-    static v8::Handle<v8::Value> WrapPeer(ENetPeer *p)
+    static v8::Local<v8::Value> WrapPeer(ENetPeer *p)
     {
         Peer *peer = new Peer(p);
         v8::Local<v8::Object> o = Nan::NewInstance(Nan::New(s_ct)->InstanceTemplate()).ToLocalChecked();
@@ -485,7 +485,7 @@ public:
         if (packet == NULL)
             info.GetReturnValue().SetNull();
         Nan::Set(result, 0, Nan::New<v8::Int32>(channelID));
-        v8::Handle<v8::Value> wrapper = Packet::WrapPacket(packet);
+        v8::Local<v8::Value> wrapper = Packet::WrapPacket(packet);
         Nan::Set(result, 1, wrapper);
         info.GetReturnValue().Set(result);
     }
@@ -592,10 +592,10 @@ public:
         s_ct.Reset(t);
     }
     
-    static v8::Handle<v8::Value> WrapEvent(ENetEvent e)
+    static v8::Local<v8::Value> WrapEvent(ENetEvent e)
     {
         Event *event = new Event(e);
-        v8::Handle<v8::Object> o = Nan::NewInstance(Nan::New(s_ct)->InstanceTemplate()).ToLocalChecked();
+        v8::Local<v8::Object> o = Nan::NewInstance(Nan::New(s_ct)->InstanceTemplate()).ToLocalChecked();
         event->Wrap(o);
         return o;
     }
@@ -758,7 +758,7 @@ public:
     static NAN_METHOD(GetAddress)
     {
         Host *host = Nan::ObjectWrap::Unwrap<Host>(info.This());
-        v8::Handle<v8::Value> result = Address::WrapAddress(host->address->address);
+        v8::Local<v8::Value> result = Address::WrapAddress(host->address->address);
         info.GetReturnValue().Set(result);
     }
     
@@ -819,7 +819,7 @@ public:
             Nan::ThrowError("error checking events");
         if (ret < 1)
             info.GetReturnValue().SetNull();
-        v8::Handle<v8::Value> result = Event::WrapEvent(event);
+        v8::Local<v8::Value> result = Event::WrapEvent(event);
         info.GetReturnValue().Set(result);
     }
     
@@ -835,7 +835,7 @@ public:
             Nan::ThrowError("error servicing host");
         if (ret < 1)
             info.GetReturnValue().SetNull();
-        v8::Handle<v8::Value> result = Event::WrapEvent(event);
+        v8::Local<v8::Value> result = Event::WrapEvent(event);
         info.GetReturnValue().Set(result); 
     }
     
